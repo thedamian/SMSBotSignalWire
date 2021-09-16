@@ -23,5 +23,5 @@ Now create a .env file with
 ```
 npm start
 ```
-But... Signal wire 
-
+But... SignalWire doesn't accept hitting your local host. To fix this one option is to use ngrok or (my favorite) localtunnel.me to give you an internet accessable<BR>
+But I also have the scripts ready  for you to push it up to now.sh/vercel. To do so you have to setup the .env variable in the project's Environment Variables
