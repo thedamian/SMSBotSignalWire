@@ -5,6 +5,8 @@
   "main": "signalwire.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node signalwire.js",
+    "dev": "nodemon signalwire.js"
   },
   "author": "Carleen Petrosian",
   "license": "ISC",

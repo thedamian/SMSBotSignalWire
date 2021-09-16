@@ -4,9 +4,12 @@ This is a bot that you'll point the messaging hook in signalwire to and get a gr
 
 ## Requirements
 
-- SignalWire.com account
-- iexcloud.io account (for the stocks) 
+Accounts in: 
+- SignalWire.com account - free incoming SMS and $0.002 outgoing (1/5th the price of twillio)
+- iexcloud.io account - for stocks
+- openweathermap.org - for weather
 
+Note no account required for coinbase (where we pull our crpyto prices) because the api key yis not required for prices.
 ## Installation
 
 ```
@@ -17,22 +20,6 @@ npm install
 Now create a .env file with 
 
 ## Running and Development
-
-
-Download `ngrok` from:
-
 ```
-https://ngrok.com/download
-```
-
-In terminal, navigate to the directory where `ngrok` is installed and run:
-
-```
-./ngrok http 3000
-```
-
-In a new terminal window, run:
-
-```
-node index.js
+npm start
 ```
