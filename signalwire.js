@@ -1,5 +1,8 @@
 const express = require("express");
 const fetch = require('node-fetch');
+const TwilioSID = process.env.TWILIO_ACCOUNT_SID;
+const TwilioToken = process.env.TWILIO_AUTH_TOKEN;
+var twilio = require('twilio');
 let app = express();
 app.use(express.urlencoded());
 require('dotenv').config();
@@ -8,83 +11,104 @@ const { RestClient } = require('@signalwire/node')
 const iexapi1 = "https://cloud.iexapis.com/stable/stock/";
 const iexapi2 = "/quote?token="+process.env.IEXAPIS;
 
-
+// SignalWire 
 app.post("/message", async (req, res) => {
-  var response = new RestClient.LaML.MessagingResponse();
-  var body = req.body.Body.toLowerCase().trim();
+  const response = new RestClient.LaML.MessagingResponse();
+  await processTwillioAndSignalWire(res,response)
+});
+
+//Twillio... for WhatsApp
+app.post("/wamessage", async (req, res) => {
+  const response = new MessagingResponse(); 
+  await processTwillioAndSignalWire(res,response)
+});
+
+const processTwillioAndSignalWire = async (res,response) =>  {
+  const body = req.body.Body.toLowerCase().trim();
+  const reply =  await ProcessSMS(body);
+  response.message(reply)
+  res.set('Content-Type', 'text/xml');
+  res.send(response.toString());
+}
+
+
+
+const ProcessSMS = async (body) =>{
   let extra = body.split(' ');
   command = extra.shift();
   extra = extra.join(' ').replace("&","");
   let from = req.body.From;
   let to = req.body.To;
   console.log(`Request to phone ${to} from ${from} body: ${body}`);
-
-  switch (command) {
-    case "time":
-	let today = new Date();
-	let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-      response.message("time is now: " + time);
-      break;
-    case "bitcoin":
-    case "btc":
-    case "bsv":
-    case "bch":
-	let btc = await getCoinbasePrice("BTC");
-	let bch = await getCoinbasePrice("BCH");
-	let bsv = await getCoinbasePrice("BSV");
-      response.message(`BTC: $${btc.price} USD, BCH $${bch.price}, BSV $${bsv.price}`);
-      break; 
-   case "ethereum","eth":
-        let eth = await getCoinbasePrice("ETH");
-      response.message(`ETH: $${eth.price} USD`);
-	break;
-  case "dogecoin":
-	let doge = await getDogeCoinPrice();
-      response.message(`MUCH WOW! DogeCoin is at: $${doge.price} USD`);
-      break;
-  case "crypto":
-	try { 
-	let symbol = extra.toUpperCase();
-	let price = await getCoinbasePrice(symbol);   
-	  response.message(`${symbol} $${price.price} USD`);  
-	} catch (ex) {
-          console.log("Error while calling crypto "+extra);
-	  console.error(ex);
-	  response.message(`No such crypto as ${extra} found`);
-        }
-	break;
-  case "stock": 
-	try {
-	getStockPrice
-        let symbol = extra.toUpperCase();
-        let price = await getStockPrice(symbol);
-          response.message(`${symbol} $${price} USD`);
+  try {
+    switch (command) {
+      case "time":
+    let today = new Date();
+    let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        ("time is now: " + time);
+        break;
+      case "bitcoin":
+      case "btc":
+      case "bsv":
+      case "bch":
+    let btc = await getCoinbasePrice("BTC");
+    let bch = await getCoinbasePrice("BCH");
+    let bsv = await getCoinbasePrice("BSV");
+        return `BTC: $${btc.price} USD, BCH $${bch.price}, BSV $${bsv.price}`;
+        break; 
+    case "ethereum","eth":
+          let eth = await getCoinbasePrice("ETH");
+          return `ETH: $${eth.price} USD`;
+    break;
+    case "dogecoin":
+    let doge = await getDogeCoinPrice();
+        return `MUCH WOW! DogeCoin is at: $${doge.price} USD`;
+        break;
+    case "crypto":
+        try { 
+          let symbol = extra.toUpperCase();
+          let price = await getCoinbasePrice(symbol);   
+          return `${symbol} $${price.price} USD`;  
         } catch (ex) {
-          console.log("Error while calling stock "+extra);
+            console.log("Error while calling crypto "+extra);
           console.error(ex);
-          response.message(`No such stock symbol ${extra} found`); 
-       }
-        break;  
-  case "weather": 
-	let city = extra;
-	if (!city) {     
-          city = "Boca Raton";  
-         }   
-	console.log("city"+city);
-	let weatherTemp = await getweather(city);
-	console.log(weatherTemp);
-	response.message(`Temperature right now in ${city} is:  ${weatherTemp}`);
-	break;
-   default:
-      response.message("Hi Ya! I'm your friendly FloridaJS.com SMS Bot.\n\nYou can ask me for Bitcoin prices, the time, and even the weather!");
-      break;
+          return `No such crypto as ${extra} found`;
+              }
+        break;
+    case "stock": 
+        try {
+        getStockPrice
+              let symbol = extra.toUpperCase();
+              let price = await getStockPrice(symbol);
+                return `${symbol} $${price} USD`;
+              } catch (ex) {
+                console.log("Error while calling stock "+extra);
+                console.error(ex);
+                return `No such stock symbol ${extra} found`; 
+            }
+          break;  
+    case "weather": 
+        let city = extra;
+        if (!city) {     
+                city = "Boca Raton";  
+              }   
+        console.log("city"+city);
+        let weatherTemp = await getweather(city);
+        console.log(weatherTemp);
+        return `Temperature right now in ${city} is:  ${weatherTemp}`;
+        break;
+    default:
+        return `Hi Ya! I'm your friendly FloridaJS.com SMS Bot.\n\nYou can ask me for "stocks", Bitcoin prices or any other "crypto", the "time", and even the "weather"!`;
+        break;
+    }
+
+  } catch (ex) {
+    return  ex;
   }
+} // end of ProcessSMS()
 
-  res.set('Content-Type', 'text/xml');
-  res.send(response.toString());
-  console.log("message Request Params from server  --->" + JSON.stringify(req.query));
 
-});
+
 
 let getStockPrice = async (stocksymbol) =>  {
     console.log("fateching " + iexapi1+stocksymbol+iexapi2);
