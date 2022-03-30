@@ -10,18 +10,14 @@ Accounts in:
 - openweathermap.org - for weather
 
 Note no account required for coinbase (where we pull our crpyto prices) because the api key yis not required for prices.
-## Installation
 
-```
-git clone https://github.com/cpetrosi/signalwire-ivr.git
-cd signalwire-ivr
-npm install
-```
-Now create a .env file with 
+Now create a .env file with the following fiels
+WEATHERAPI=XXXXX <- openweathermap api
+IEXAPIS=XXXXX <- iexcloud.io api
 
-## Running and Development
-```
-npm start
-```
-But... SignalWire doesn't accept hitting your local host. To fix this one option is to use ngrok or (my favorite) localtunnel.me to give you an internet accessable<BR>
-But I also have the scripts ready  for you to push it up to now.sh/vercel. To do so you have to setup the .env variable in the project's Environment Variables
+TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN are needed if you want to intergrated twillio (you know...for whatsapp...if you want)
+
+## Installing and Testing
+This project has to be published and accessible to the world. Even to test it. 
+the reason is that you'll be pointing the /message and /wamessage endpoint to be hit by signalwire and twilio 
+Because of this you can start using services like https://localtunnel.me which will let your local development box be accessible to the outside world.
