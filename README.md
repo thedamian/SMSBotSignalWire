@@ -11,9 +11,13 @@ Accounts in:
 
 Note no account required for coinbase (where we pull our crpyto prices) because the api key yis not required for prices.
 
-Now create a .env file with the following fiels
-WEATHERAPI=XXXXX <- openweathermap api
-IEXAPIS=XXXXX <- iexcloud.io api
+Now create a .env file with the following fiels<BR>
+WEATHERAPI=XXXXX <- openweathermap api<BR>
+IEXAPIS=XXXXX <- iexcloud.io api<BR>
+SIGNALWIRE_PRODJECT_ID= project id from signalwire.com <BR>
+SIGNALWIRE_TOKEN= token from the signalwire.com  <BR>
+SIGNALWIRE_SPACE= space (it's usually something.signalwire.com)  <BR>
+SIGNALWIRE_OUT_PHONE= phone number including + sign in front  <BR>
 
 TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN are needed if you want to intergrated twillio (you know...for whatsapp...if you want)
 
