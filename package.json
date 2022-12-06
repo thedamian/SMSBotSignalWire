@@ -12,6 +12,7 @@
   "author": "Carleen Petrosian",
   "license": "ISC",
   "dependencies": {
+    "@signalwire/compatibility-api": "^3.0.3",
     "@signalwire/node": "^1.2.2",
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
