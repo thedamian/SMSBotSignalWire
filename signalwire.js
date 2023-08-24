@@ -8,38 +8,36 @@ app.use(express.urlencoded());
 require('dotenv').config();
 const  weatherAPIKey =  process.env.WEATHERAPI;
 const { RestClient } = require('@signalwire/node')
+//const { RestClient } = require("@signalwire/compatibility-api");
 const iexapi1 = "https://cloud.iexapis.com/stable/stock/";
 const iexapi2 = "/quote?token="+process.env.IEXAPIS;
 
 // SignalWire 
 app.post("/message", async (req, res) => {
-  const response = new RestClient.LaML.MessagingResponse();
-  await processTwillioAndSignalWire(res,response)
+  const {Body,To,From} = req.body;
+  const reply = await ProcessSMS(Body,From,To)
+  var response = new RestClient.LaML.MessagingResponse();
+  response.message(reply);
+  res.set('Content-Type', 'text/xml');
+  res.send(response.toString());
+  console.log("replied with:",reply);
 });
 
 //Twillio... for WhatsApp
 app.post("/wamessage", async (req, res) => {
-  const response = new MessagingResponse(); 
-  await processTwillioAndSignalWire(res,response)
+  console.log("twillio req",req);
+  const {Body,To,From} = req.body;
+  const reply = await ProcessSMS(Body,From,To)
+  res.json({ok})
 });
 
-const processTwillioAndSignalWire = async (res,response) =>  {
-  const body = req.body.Body.toLowerCase().trim();
-  const reply =  await ProcessSMS(body);
-  response.message(reply)
-  res.set('Content-Type', 'text/xml');
-  res.send(response.toString());
-}
 
 
-
-const ProcessSMS = async (body) =>{
-  let extra = body.split(' ');
+const ProcessSMS = async (message,from,to) =>{
+  let extra = message.split(' ');
   command = extra.shift();
   extra = extra.join(' ').replace("&","");
-  let from = req.body.From;
-  let to = req.body.To;
-  console.log(`Request to phone ${to} from ${from} body: ${body}`);
+  console.log(`Request to phone ${to} from ${from} message: ${message}`);
   try {
     switch (command) {
       case "time":
